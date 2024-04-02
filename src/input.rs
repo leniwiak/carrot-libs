@@ -96,14 +96,6 @@ pub fn get(prompt:String) -> Vec<String> {
                         if idx == input.len() || input[idx].is_whitespace() { break }
                     }
                 }
-
-                // ANY CHARACTER WITHOUT CTRL: Show it on keyboard and add it to "input" variable
-                Key(KeyEvent {code: KeyCode::Char(c), ..}) => {
-                    // Insert a char in "input" on position where the cursor is located + the number 
-                    input.insert(idx, c);
-                    // Move cursor to the right as we type
-                    idx +=1;
-                },
                 
                 // HOME and END keys support
                 Key(KeyEvent {code: KeyCode::Home, ..}) => {
@@ -130,6 +122,23 @@ pub fn get(prompt:String) -> Vec<String> {
                         idx -= 1;
                     } else {print!("\x07")};
                 },
+                // CTRL+BACKSPACE: Remove character before cursor until whitespace
+                // FUNFACT: Terminal emulators on Linux detect CTRL+Backspace as CTRL+H
+                // The code below is correct. Don't change KeyCode::Char to KeyCode::Spacebar
+                Key(KeyEvent {code: KeyCode::Char(h), modifiers: KeyModifiers::CONTROL, ..}) => {
+                    while idx > 0 {
+                        if !input[idx-1].is_whitespace() {
+                            input.remove(idx-1);
+                        }
+                        else {
+                            // Remove the remaining white space
+                            input.remove(idx-1);
+                            idx-=1;
+                            break;
+                        }
+                        idx-=1;
+                    }
+                },
 
                 // DEL: Remove character on cursor
                 Key(KeyEvent {code: KeyCode::Delete, modifiers: KeyModifiers::NONE, ..}) => {
@@ -151,6 +160,14 @@ pub fn get(prompt:String) -> Vec<String> {
                     input.push('\n');
                     crossterm::terminal::disable_raw_mode().unwrap();
                     break;
+                },
+
+                // ANY CHARACTER WITHOUT CTRL: Show it on keyboard and add it to "input" variable
+                Key(KeyEvent {code: KeyCode::Char(c), ..}) => {
+                    // Insert a char in "input" on position where the cursor is located + the number 
+                    input.insert(idx, c);
+                    // Move cursor to the right as we type
+                    idx +=1;
                 },
                
                 // OTHER
