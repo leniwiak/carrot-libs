@@ -1,0 +1,20 @@
+[package]
+name = "carrot_libs"
+version = "0.2.4"
+edition = "2021"
+
+[build]
+rustflags=["-C prefer-dynamic"]
+
+[profile.release]
+strip = true
+debug = false
+
+[dependencies]
+crossterm = "*"
+
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "vendor"
