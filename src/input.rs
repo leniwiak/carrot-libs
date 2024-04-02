@@ -90,7 +90,22 @@ pub fn get(prompt:String) -> Vec<String> {
                 },
 
                 // CTRL+ARROW: Move cursor to the next whitespace
-                // todo
+                Key(KeyEvent {code: KeyCode::Left, modifiers: KeyModifiers::CONTROL, ..}) => {
+                    while idx != 0 {
+                        idx -= 1;
+                        if input[idx].is_whitespace() {
+                            break
+                        }
+                    }
+                }
+                Key(KeyEvent {code: KeyCode::Right, modifiers: KeyModifiers::CONTROL, ..}) => {
+                    while idx != input.len() {
+                        idx += 1;
+                        if idx == input.len() || input[idx].is_whitespace() {
+                            break
+                        }
+                    }
+                }
 
                 // ANY CHARACTER WITHOUT CTRL: Show it on keyboard and add it to "input" variable
                 Key(KeyEvent {code: KeyCode::Char(c), ..}) => {
