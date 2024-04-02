@@ -71,22 +71,14 @@ pub fn get(prompt:String) -> Vec<String> {
                     if idx != 0 {
                         // Move cursor to left
                         idx -= 1;
-                    }
-                    else {
-                        print!("\x07");
-                        continue;
-                    };
+                    } else {print!("\x07");continue;};
                     
                 },
                 Key(KeyEvent {code: KeyCode::Right, modifiers: KeyModifiers::NONE, ..}) => {
                     if idx != input.len() {
                         // Move cursor to right
                         idx += 1;
-                    }
-                    else {
-                        print!("\x07");
-                        continue;
-                    };
+                    } else {print!("\x07");continue;};
                 },
 
                 // CTRL+ARROW: Move cursor to the next whitespace
@@ -101,9 +93,7 @@ pub fn get(prompt:String) -> Vec<String> {
                 Key(KeyEvent {code: KeyCode::Right, modifiers: KeyModifiers::CONTROL, ..}) => {
                     while idx != input.len() {
                         idx += 1;
-                        if idx == input.len() || input[idx].is_whitespace() {
-                            break
-                        }
+                        if idx == input.len() || input[idx].is_whitespace() { break }
                     }
                 }
 
@@ -125,10 +115,9 @@ pub fn get(prompt:String) -> Vec<String> {
                     idx=input.len();
                 }
 
-                // BACKSPACE: Remove character on cursor
-                Key(KeyEvent {code: KeyCode::Backspace, ..}) => {
+                // BACKSPACE: Remove character before cursor
+                Key(KeyEvent {code: KeyCode::Backspace, modifiers: KeyModifiers::NONE, ..}) => {
                     if idx != 0 {
-                        // Delete from "input" where cursor is located
                         if idx != input.len() {
                             input.remove(idx-1);
                         }
@@ -139,10 +128,22 @@ pub fn get(prompt:String) -> Vec<String> {
                         };
                         // Move cursor
                         idx -= 1;
+                    } else {print!("\x07")};
+                },
+
+                // DEL: Remove character on cursor
+                Key(KeyEvent {code: KeyCode::Delete, modifiers: KeyModifiers::NONE, ..}) => {
+                    if idx != input.len() {
+                        input.remove(idx);
+                    } else {print!("\x07")};
+                },
+                // CTRL+DEL: Remove all characters after cursor until whitespace
+                Key(KeyEvent {code: KeyCode::Delete, modifiers: KeyModifiers::CONTROL, ..}) => {
+                    while idx < input.len() {
+                        if !input[idx].is_whitespace() {
+                            input.remove(idx);
+                        }
                     }
-                    else {
-                        print!("\x07");
-                    };
                 },
 
                 // ENTER: Quickly append newline character to "input" and stop waiting for input by breaking out of the loop

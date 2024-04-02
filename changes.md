@@ -8,7 +8,7 @@
 
 ### Added on 2.04.2024
 
-- INPUT: CTRL+ARROW keys support
+- INPUT: CTRL+ARROW, DEL, CTRL+DEL keys support
 
 ### Waiting features:
-- INPUT: DEL, CTRL+DEL, CTRL+BACKSPACE key support
+- INPUT: CTRL+BACKSPACE key support
