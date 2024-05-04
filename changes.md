@@ -4,8 +4,15 @@
 
 - INPUT: Deal with char boundaries
 
-# Release 0.2.5
+# Release 0.2.5:
 
 ### Added on 2.04.2024
 
 - INPUT: CTRL+ARROW, DEL, CTRL+DEL, CTRL+BACKSPACE keys support
+
+# Release 0.2.6:
+
+### Added on 4.05.2024
+
+- INPUT: Move some code from GET() to DETECT() - a new function responsible just for detecting keys
+- ANSI: New library containing some usefull ansi codes (NEW!)

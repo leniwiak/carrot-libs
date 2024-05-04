@@ -4,3 +4,4 @@ pub mod args;
 pub mod dir;
 pub mod fileinfo;
 pub mod input;
+pub mod ansi;

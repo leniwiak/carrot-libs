@@ -9,6 +9,73 @@ fn flush() {
     io::stdout().flush().expect("Failed to flush terminal output!")
 }
 
+pub fn detect() -> (&'static str, Option<char>) {
+    // Go to raw mode to get more control over terminal
+    crossterm::terminal::enable_raw_mode().unwrap();
+
+    // Flush on start and end of the loop
+    flush();
+
+    // Initialize event listener
+    let event = event::read().unwrap();
+
+    crossterm::terminal::disable_raw_mode().unwrap();
+
+    match event {
+        Key(KeyEvent {code: KeyCode::Char('z'), modifiers: KeyModifiers::CONTROL, ..}) => {
+            ("STOP", None)
+        },
+        Key(KeyEvent {code: KeyCode::Char('d'), modifiers: KeyModifiers::CONTROL, ..}) => {
+            ("STOP", None)
+        },
+        Key(KeyEvent {code: KeyCode::Left, modifiers: KeyModifiers::NONE, ..}) => {
+            ("LEFT", None)
+        },
+        Key(KeyEvent {code: KeyCode::Right, modifiers: KeyModifiers::NONE, ..}) => {
+            ("RIGHT", None)
+        },
+        Key(KeyEvent {code: KeyCode::Up, modifiers: KeyModifiers::NONE, ..}) => {
+            ("UP", None)
+        },
+        Key(KeyEvent {code: KeyCode::Down, modifiers: KeyModifiers::NONE, ..}) => {
+            ("DOWN", None)
+        },
+        Key(KeyEvent {code: KeyCode::Left, modifiers: KeyModifiers::CONTROL, ..}) => {
+            ("CTRL-LEFT", None)
+        },
+        Key(KeyEvent {code: KeyCode::Right, modifiers: KeyModifiers::CONTROL, ..}) => {
+            ("CTRL-RIGHT", None)
+        },
+        Key(KeyEvent {code: KeyCode::Home, ..}) => {
+            ("HOME", None)
+        },
+        Key(KeyEvent {code: KeyCode::End, ..}) => {
+            ("END", None)
+        },
+        Key(KeyEvent {code: KeyCode::Backspace, modifiers: KeyModifiers::NONE, ..}) => {
+            ("BACKSPACE", None)
+        },
+        Key(KeyEvent {code: KeyCode::Char(h), modifiers: KeyModifiers::CONTROL, ..}) => {
+            ("CTRL-BACKSPACE", None)
+        },
+        Key(KeyEvent {code: KeyCode::Delete, modifiers: KeyModifiers::NONE, ..}) => {
+            ("DEL", None)
+        },
+        Key(KeyEvent {code: KeyCode::Delete, modifiers: KeyModifiers::CONTROL, ..}) => {
+            ("CTRL+DEL", None)
+        },
+        Key(KeyEvent {code: KeyCode::Enter, ..}) => {
+            ("ENTER", None)
+        },
+        Key(KeyEvent {code: KeyCode::Char(c), ..}) => {
+            ("CHAR", Some(c))
+        },
+        _ => {
+            ("UNKNOWN", None)
+        }
+    }
+}
+
 pub fn get(prompt:String) -> Vec<String> {
     // FOR ALL COMMENTS BELLOW: Assume, that user typed this command into a shell: af file then ad dir
     // This variable contains full line typed by the user (List 1.: 'af file then ad dir')
@@ -32,30 +99,11 @@ pub fn get(prompt:String) -> Vec<String> {
         let mut idx = 0;
 
         loop {
-            // Go to raw mode to get more control over terminal
-            crossterm::terminal::enable_raw_mode().unwrap();
-
-            // Flush on start and end of the loop
-            flush();
-
-            // Initialize event listener
-            let event = event::read().unwrap();
+            let (key_type, letter) = detect();
             // Check event
-            match event {
-                // CTRL+Z: Quit
-                Key(KeyEvent {code: KeyCode::Char('z'), modifiers: KeyModifiers::CONTROL, ..}) => {
-                    // Inspired by BASH
-                    // Don't exit unless the prompt is empty
-                    if input.is_empty() {
-                        // Disable raw mode and quit
-                        crossterm::terminal::disable_raw_mode().expect("Cannot quit from raw terminal mode!");
-                        println!();
-                        process::exit(1);
-                    }
-                },
-
-                // CTRL+D: Quit
-                Key(KeyEvent {code: KeyCode::Char('d'), modifiers: KeyModifiers::CONTROL, ..}) => {
+            match key_type {
+                // CTRL+Z or CTRL+D: Quit
+                "STOP" => {
                     // Inspired by BASH
                     // Don't exit unless the prompt is empty
                     if input.is_empty() {
@@ -67,14 +115,14 @@ pub fn get(prompt:String) -> Vec<String> {
                 },
 
                 // ARROWS without CTRL: Cursor movement
-                Key(KeyEvent {code: KeyCode::Left, modifiers: KeyModifiers::NONE, ..}) => {
+                "LEFT" => {
                     if idx != 0 {
                         // Move cursor to left
                         idx -= 1;
                     } else {print!("\x07");continue;};
                     
                 },
-                Key(KeyEvent {code: KeyCode::Right, modifiers: KeyModifiers::NONE, ..}) => {
+                "RIGHT" => {
                     if idx != input.len() {
                         // Move cursor to right
                         idx += 1;
@@ -82,7 +130,7 @@ pub fn get(prompt:String) -> Vec<String> {
                 },
 
                 // CTRL+ARROW: Move cursor to the next whitespace
-                Key(KeyEvent {code: KeyCode::Left, modifiers: KeyModifiers::CONTROL, ..}) => {
+                "CTRL+LEFT" => {
                     while idx != 0 {
                         idx -= 1;
                         if input[idx].is_whitespace() {
@@ -90,7 +138,7 @@ pub fn get(prompt:String) -> Vec<String> {
                         }
                     }
                 }
-                Key(KeyEvent {code: KeyCode::Right, modifiers: KeyModifiers::CONTROL, ..}) => {
+                "CTRL+RIGHT" => {
                     while idx != input.len() {
                         idx += 1;
                         if idx == input.len() || input[idx].is_whitespace() { break }
@@ -98,17 +146,17 @@ pub fn get(prompt:String) -> Vec<String> {
                 }
                 
                 // HOME and END keys support
-                Key(KeyEvent {code: KeyCode::Home, ..}) => {
+                "HOME" => {
                     // Move cursor back to the prompt
                     idx=0;
                 }
-                Key(KeyEvent {code: KeyCode::End, ..}) => {
+                "END" => {
                     // Move where "input" is reaching it's end
                     idx=input.len();
                 }
 
                 // BACKSPACE: Remove character before cursor
-                Key(KeyEvent {code: KeyCode::Backspace, modifiers: KeyModifiers::NONE, ..}) => {
+                "BACKSPACE" => {
                     if idx != 0 {
                         if idx != input.len() {
                             input.remove(idx-1);
@@ -125,7 +173,7 @@ pub fn get(prompt:String) -> Vec<String> {
                 // CTRL+BACKSPACE: Remove character before cursor until whitespace
                 // FUNFACT: Terminal emulators on Linux detect CTRL+Backspace as CTRL+H
                 // The code below is correct. Don't change KeyCode::Char to KeyCode::Spacebar
-                Key(KeyEvent {code: KeyCode::Char(h), modifiers: KeyModifiers::CONTROL, ..}) => {
+                "CTRL+BACKSPACE" => {
                     while idx > 0 {
                         if !input[idx-1].is_whitespace() {
                             input.remove(idx-1);
@@ -141,13 +189,13 @@ pub fn get(prompt:String) -> Vec<String> {
                 },
 
                 // DEL: Remove character on cursor
-                Key(KeyEvent {code: KeyCode::Delete, modifiers: KeyModifiers::NONE, ..}) => {
+                "DEL" => {
                     if idx != input.len() {
                         input.remove(idx);
                     } else {print!("\x07")};
                 },
                 // CTRL+DEL: Remove all characters after cursor until whitespace
-                Key(KeyEvent {code: KeyCode::Delete, modifiers: KeyModifiers::CONTROL, ..}) => {
+                "CTRL+DEL" => {
                     while idx < input.len() {
                         if !input[idx].is_whitespace() {
                             input.remove(idx);
@@ -156,25 +204,29 @@ pub fn get(prompt:String) -> Vec<String> {
                 },
 
                 // ENTER: Quickly append newline character to "input" and stop waiting for input by breaking out of the loop
-                Key(KeyEvent {code: KeyCode::Enter, ..}) => {
+                "ENTER" => {
                     input.push('\n');
                     crossterm::terminal::disable_raw_mode().unwrap();
                     break;
                 },
-
-                // ANY CHARACTER WITHOUT CTRL: Show it on keyboard and add it to "input" variable
-                Key(KeyEvent {code: KeyCode::Char(c), ..}) => {
-                    // Insert a char in "input" on position where the cursor is located + the number 
-                    input.insert(idx, c);
-                    // Move cursor to the right as we type
-                    idx +=1;
-                },
                
                 // OTHER
-                _ => {
+                "UNKNOWN" => {
                     // Bell!
                     print!("\x07");
                 },
+
+                // ANY CHARACTER WITHOUT CTRL: Show it on keyboard and add it to "input" variable
+                "CHAR" => {
+                    // Insert a char in "input" on position where the cursor is located + the number 
+                    input.insert(idx, letter.expect(""));
+                    // Move cursor to the right as we type
+                    idx +=1;
+                },
+                _ => {
+                    eprintln!("Impossible :o");
+                    process::exit(1);
+                }
             };
             // Move to start of the column
             print!("\r");
@@ -190,7 +242,6 @@ pub fn get(prompt:String) -> Vec<String> {
         };
         // Quit from raw mode when we're out of the loop
         print!("\n\r");
-        crossterm::terminal::disable_raw_mode().unwrap();
         /*
             Character division helps to find individual arguments (words)
             Expected output: ('af' 'file' 'then' 'ad' 'dir')
