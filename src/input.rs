@@ -22,9 +22,7 @@ pub fn detect() -> (&'static str, Option<char>) {
     crossterm::terminal::disable_raw_mode().unwrap();
 
     match event {
-        Key(KeyEvent {code: KeyCode::Char('z'), modifiers: KeyModifiers::CONTROL, ..}) => {
-            ("STOP", None)
-        },
+        Key(KeyEvent {code: KeyCode::Char('z'), modifiers: KeyModifiers::CONTROL, ..}) |
         Key(KeyEvent {code: KeyCode::Char('d'), modifiers: KeyModifiers::CONTROL, ..}) => {
             ("STOP", None)
         },
@@ -40,11 +38,13 @@ pub fn detect() -> (&'static str, Option<char>) {
         Key(KeyEvent {code: KeyCode::Down, modifiers: KeyModifiers::NONE, ..}) => {
             ("DOWN", None)
         },
-        Key(KeyEvent {code: KeyCode::Left, modifiers: KeyModifiers::CONTROL, ..}) => {
-            ("CTRL-LEFT", None)
+        Key(KeyEvent {code: KeyCode::Left, modifiers: KeyModifiers::CONTROL, ..}) |
+            Key(KeyEvent {code: KeyCode::Left, modifiers: KeyModifiers::ALT, ..}) => {
+            ("SUPER-LEFT", None)
         },
-        Key(KeyEvent {code: KeyCode::Right, modifiers: KeyModifiers::CONTROL, ..}) => {
-            ("CTRL-RIGHT", None)
+        Key(KeyEvent {code: KeyCode::Right, modifiers: KeyModifiers::CONTROL, ..}) |
+        Key(KeyEvent {code: KeyCode::Right, modifiers: KeyModifiers::ALT, ..}) => {
+            ("SUPER-RIGHT", None)
         },
         Key(KeyEvent {code: KeyCode::Home, ..}) => {
             ("HOME", None)
@@ -55,14 +55,16 @@ pub fn detect() -> (&'static str, Option<char>) {
         Key(KeyEvent {code: KeyCode::Backspace, modifiers: KeyModifiers::NONE, ..}) => {
             ("BACKSPACE", None)
         },
-        Key(KeyEvent {code: KeyCode::Char(h), modifiers: KeyModifiers::CONTROL, ..}) => {
-            ("CTRL-BACKSPACE", None)
+        Key(KeyEvent {code: KeyCode::Char(h), modifiers: KeyModifiers::CONTROL, ..}) |
+            Key(KeyEvent {code: KeyCode::Char(h), modifiers: KeyModifiers::ALT, ..}) => {
+            ("SUPER-BACKSPACE", None)
         },
         Key(KeyEvent {code: KeyCode::Delete, modifiers: KeyModifiers::NONE, ..}) => {
             ("DEL", None)
         },
-        Key(KeyEvent {code: KeyCode::Delete, modifiers: KeyModifiers::CONTROL, ..}) => {
-            ("CTRL+DEL", None)
+        Key(KeyEvent {code: KeyCode::Delete, modifiers: KeyModifiers::CONTROL, ..}) |
+            Key(KeyEvent {code: KeyCode::Delete, modifiers: KeyModifiers::ALT, ..}) => {
+            ("SUPER-DEL", None)
         },
         Key(KeyEvent {code: KeyCode::Enter, ..}) => {
             ("ENTER", None)
@@ -129,8 +131,8 @@ pub fn get(prompt:String) -> Vec<String> {
                     } else {print!("\x07");continue;};
                 },
 
-                // CTRL+ARROW: Move cursor to the next whitespace
-                "CTRL+LEFT" => {
+                // CTRL+ARROW or ALT+ARROW: Move cursor to the next whitespace
+                "SUPER-LEFT" => {
                     while idx != 0 {
                         idx -= 1;
                         if input[idx].is_whitespace() {
@@ -138,7 +140,7 @@ pub fn get(prompt:String) -> Vec<String> {
                         }
                     }
                 }
-                "CTRL+RIGHT" => {
+                "SUPER-RIGHT" => {
                     while idx != input.len() {
                         idx += 1;
                         if idx == input.len() || input[idx].is_whitespace() { break }
@@ -170,10 +172,10 @@ pub fn get(prompt:String) -> Vec<String> {
                         idx -= 1;
                     } else {print!("\x07")};
                 },
-                // CTRL+BACKSPACE: Remove character before cursor until whitespace
+                // CTRL+BACKSPACE or ALT+BACKSPACE: Remove character before cursor until whitespace
                 // FUNFACT: Terminal emulators on Linux detect CTRL+Backspace as CTRL+H
-                // The code below is correct. Don't change KeyCode::Char to KeyCode::Spacebar
-                "CTRL+BACKSPACE" => {
+                // The code below is correct. Don't change KeyCode::Char to KeyCode::Backspace
+                "SUPER-BACKSPACE" => {
                     while idx > 0 {
                         if !input[idx-1].is_whitespace() {
                             input.remove(idx-1);
@@ -194,8 +196,8 @@ pub fn get(prompt:String) -> Vec<String> {
                         input.remove(idx);
                     } else {print!("\x07")};
                 },
-                // CTRL+DEL: Remove all characters after cursor until whitespace
-                "CTRL+DEL" => {
+                // CTRL/ALT+DEL: Remove all characters after cursor until whitespace
+                "SUPER-DEL" => {
                     while idx < input.len() {
                         if !input[idx].is_whitespace() {
                             input.remove(idx);
