@@ -20,3 +20,9 @@
 ### Added on 13.05.2024
 
 - INPUT: Added secure prompt
+
+# Release 0.2.7:
+
+### Added on 13.05.2024
+
+- SYSTEM: Access system information (NEW!)

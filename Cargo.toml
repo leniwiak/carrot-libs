@@ -1,6 +1,6 @@
 [package]
 name = "carrot_libs"
-version = "0.2.6"
+version = "0.2.7"
 edition = "2021"
 
 [build]
@@ -12,6 +12,7 @@ debug = false
 
 [dependencies]
 crossterm = "*"
+sha3 = "*"
 
 [source.crates-io]
 replace-with = "vendored-sources"
