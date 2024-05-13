@@ -76,7 +76,7 @@ pub fn detect() -> (&'static str, Option<char>) {
     }
 }
 
-pub fn get(prompt:String) -> Vec<String> {
+pub fn get(prompt:String,secure:bool) -> Vec<String> {
     // FOR ALL COMMENTS BELLOW: Assume, that user typed this command into a shell: af file then ad dir
     // This variable contains full line typed by the user (List 1.: 'af file then ad dir')
     let mut input:Vec<char> = Vec::new();
@@ -87,6 +87,9 @@ pub fn get(prompt:String) -> Vec<String> {
     
     // Print a prompt
     print!("{prompt}");
+    if secure {
+        print!("This prompt is secured. Everything you'll write won't be shown.");
+    }
 
     // Flush stdout to print the prompt
     io::stdout().flush().expect("Cannot flush output!");
@@ -133,9 +136,7 @@ pub fn get(prompt:String) -> Vec<String> {
                 "CTRL+LEFT" => {
                     while idx != 0 {
                         idx -= 1;
-                        if input[idx].is_whitespace() {
-                            break
-                        }
+                        if input[idx].is_whitespace() { break }
                     }
                 }
                 "CTRL+RIGHT" => {
@@ -228,16 +229,18 @@ pub fn get(prompt:String) -> Vec<String> {
                     process::exit(1);
                 }
             };
-            // Move to start of the column
-            print!("\r");
-            // Clear everything on that line
-            print!("{}", Clear(ClearType::CurrentLine));
             // Show prompt and contents of input
-            let input_string = input.iter().collect::<String>();
-            print!("{}{}", prompt, input_string);
-            // Move cursor to position defined in "idx" + "initial_cur_pos"
-            print!("{}", crossterm::cursor::MoveToColumn(idx as u16 +initial_cur_pos)); 
-            // Flush on start and end of the loop
+            if !secure {
+                // Move to start of the column
+                print!("\r");
+                // Clear everything on that line
+                print!("{}", Clear(ClearType::CurrentLine));
+                let input_string = input.iter().collect::<String>();
+                print!("{}{}", prompt, input_string);
+                // Move cursor to position defined in "idx" + "initial_cur_pos"
+                // Flush on start and end of the loop
+                print!("{}", crossterm::cursor::MoveToColumn(idx as u16 +initial_cur_pos)); 
+            }
             flush();
         };
         // Quit from raw mode when we're out of the loop

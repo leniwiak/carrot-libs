@@ -16,3 +16,7 @@
 
 - INPUT: Move some code from GET() to DETECT() - a new function responsible just for detecting keys
 - ANSI: New library containing some usefull ansi codes (NEW!)
+
+### Added on 13.05.2024
+
+- INPUT: Added secure prompt
