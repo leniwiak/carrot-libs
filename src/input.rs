@@ -67,6 +67,9 @@ pub fn detect() -> (&'static str, Option<char>) {
         Key(KeyEvent {code: KeyCode::Enter, ..}) => {
             ("ENTER", None)
         },
+        Key(KeyEvent {code: KeyCode::Esc, ..}) => {
+            ("ESCAPE", None)
+        },
         Key(KeyEvent {code: KeyCode::Char(c), ..}) => {
             ("CHAR", Some(c))
         },
@@ -81,16 +84,12 @@ pub fn get(prompt:String,secure:bool) -> Vec<String> {
     // This variable contains full line typed by the user (List 1.: 'af file then ad dir')
     let mut input:Vec<char> = Vec::new();
 
-    // This list contains arguments passed by the user and with all built-in commands separated 
-    // (List 1.: 'af', 'file') (List 2.: 'then') (List 3.: 'ad', 'dir')
-    let words: Vec<String> = Vec::new();
-    
     // Print a prompt
     print!("{prompt}");
     if secure {
-        print!("This prompt is secured. Everything you'll write won't be shown.");
+        print!("This prompt is secured. You're typing silently.");
     }
-
+    
     // Flush stdout to print the prompt
     io::stdout().flush().expect("Cannot flush output!");
         // Read line into "input"
@@ -102,6 +101,20 @@ pub fn get(prompt:String,secure:bool) -> Vec<String> {
         let mut idx = 0;
 
         loop {
+            // Show prompt and contents of input
+            if !secure {
+                // Move to start of the column
+                print!("\r");
+                // Clear everything on that line
+                print!("{}", Clear(ClearType::CurrentLine));
+                let input_string = input.iter().collect::<String>();
+                print!("{}{}", prompt, input_string);
+                // Move cursor to position defined in "idx" + "initial_cur_pos"
+                // Flush on start and end of the loop
+                print!("{}", crossterm::cursor::MoveToColumn(idx as u16 +initial_cur_pos)); 
+            }
+            flush();
+
             let (key_type, letter) = detect();
             // Check event
             match key_type {
@@ -229,26 +242,9 @@ pub fn get(prompt:String,secure:bool) -> Vec<String> {
                     process::exit(1);
                 }
             };
-            // Show prompt and contents of input
-            if !secure {
-                // Move to start of the column
-                print!("\r");
-                // Clear everything on that line
-                print!("{}", Clear(ClearType::CurrentLine));
-                let input_string = input.iter().collect::<String>();
-                print!("{}{}", prompt, input_string);
-                // Move cursor to position defined in "idx" + "initial_cur_pos"
-                // Flush on start and end of the loop
-                print!("{}", crossterm::cursor::MoveToColumn(idx as u16 +initial_cur_pos)); 
-            }
-            flush();
         };
         // Quit from raw mode when we're out of the loop
         print!("\n\r");
-        /*
-            Character division helps to find individual arguments (words)
-            Expected output: ('af' 'file' 'then' 'ad' 'dir')
-        */
         let input_string = input.iter().collect::<String>();
         input_string.split_whitespace().map(str::to_string).collect()
 }
