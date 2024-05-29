@@ -26,3 +26,9 @@
 ### Added on 13.05.2024
 
 - SYSTEM: Access system information (NEW!)
+
+# Release 0.3.0:
+
+- ANSI: Renamed to CLI
+https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
+- *: Properly return errors

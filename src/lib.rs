@@ -4,5 +4,5 @@ pub mod args;
 pub mod dir;
 pub mod fileinfo;
 pub mod input;
-pub mod ansi;
+pub mod cli;
 pub mod system;

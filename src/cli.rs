@@ -1,10 +1,14 @@
-pub struct Ansi {
+pub struct StylesStruct {
     pub none: &'static str,
     pub bold: &'static str,
     pub italic: &'static str,
     pub underline: &'static str,
     pub blink: &'static str,
     pub strike: &'static str,
+}
+
+pub struct ColorsStruct {
+    pub none: &'static str,
     pub fg_black: &'static str,
     pub fg_red: &'static str,
     pub fg_green: &'static str,
@@ -41,14 +45,48 @@ pub struct Ansi {
     pub bg_bright_white: &'static str,
 }
 
-impl Ansi {
-    pub const BASIC:Ansi = Ansi {
+pub fn cursor<S: AsRef<str>>(action: S, position: usize) -> Result<(), &'static str> {
+    let action = action.as_ref();
+    match action {
+        "home" => { println!("\x1b[H"); Ok(()) },
+        "up" => { println!("\x1b[{position}A"); Ok(()) },
+        "down" => { println!("\x1b[{position}B"); Ok(()) },
+        "right" => { println!("\x1b[{position}C"); Ok(()) },
+        "left" => { println!("\x1b[{position}D"); Ok(()) },
+        "save" => { println!("\x1b[s"); Ok(()) },
+        "restore" => { println!("\x1b[u"); Ok(()) },
+        _ => { Err("Incorrect function argument is given!") },
+    }
+}
+
+pub fn erease<S: AsRef<str>>(action: S, position: usize) -> Result<(), &'static str> {
+    let action = action.as_ref();
+    match action {
+        "cur_to_eos" => { println!("\x1b[J"); Ok(()) },
+        "cur_to_bos" => { println!("\x1b[1J"); Ok(()) },
+        "all" => { println!("\x1b[2J"); Ok(()) },
+        "saved" => { println!("\x1b[3J"); Ok(()) },
+        "cur_to_eol" => { println!("\x1b[K"); Ok(()) },
+        "cur_to_bol" => { println!("\x1b[1K"); Ok(()) },
+        "line" => { println!("\x1b[2K"); Ok(()) },
+        _ => { Err("Incorrect function argument is given!") },
+    }
+}
+
+impl StylesStruct {
+    pub const STYLE:StylesStruct = StylesStruct {
         none: "\x1b[0m",
         bold: "\x1b[1m",
         italic: "\x1b[3m",
         underline: "\x1b[4m",
         blink: "\x1b[5m",
         strike: "\x1b[9m",
+    };
+}
+
+impl ColorsStruct {
+    pub const COLOR:ColorsStruct = ColorsStruct {
+        none: "\x1b[0m",
         fg_black: "\x1b[30m",
         fg_red: "\x1b[31m",
         fg_green: "\x1b[32m",

@@ -55,7 +55,7 @@ pub fn password_check(user:u32, pass:&String) -> Result<bool, String> {
     let lines:Vec<&str> = data.lines().collect();
     let mut i = 1;
     for l in &lines {
-        if *l == format!("id = {}", user.to_string()) {
+        if *l == format!("id = {}", user) {
             i += 4;
             let l = lines[i].strip_prefix("password = \"").unwrap();
             let l = l.strip_suffix('\"').unwrap();
