@@ -79,10 +79,6 @@ pub fn detect() -> (&'static str, Option<char>) {
     }
 }
 
-pub fn get<S: AsRef<str>>(prompt:S,secure:bool) -> Result<Vec<String>, String> {
-    get_with_default(prompt.as_ref().to_owned(), secure, None, None)
-}
-
 pub fn ask<S: AsRef<str>>(opt: S) -> Result<bool, String> {
     match get(format!("{}: Do you really want to delete this? [y/n]: ", opt.as_ref()), false) {
         Err(e) => {
@@ -105,6 +101,10 @@ pub fn ask<S: AsRef<str>>(opt: S) -> Result<bool, String> {
     
 }
 
+pub fn get<S: AsRef<str>>(prompt:S,secure:bool) -> Result<Vec<String>, String> {
+    get_with_default(prompt.as_ref().to_owned(), secure, None, None)
+}
+
 pub fn get_with_default(prompt:String,secure:bool,starting_value:Option<String>,starting_curpos:Option<usize>) -> Result<Vec<String>, String> {
     // FOR ALL COMMENTS BELLOW: Assume, that user typed this command into a shell: af file then ad dir
     // This variable contains full line typed by the user (List 1.: 'af file then ad dir')
@@ -116,7 +116,7 @@ pub fn get_with_default(prompt:String,secure:bool,starting_value:Option<String>,
         print!("This prompt is secured. You're typing silently.");
     }
     // Print starting value if any
-    if let Some(v) = starting_value {
+    if let Some(ref v) = starting_value {
         print!("{v}")
     }
     
@@ -130,9 +130,13 @@ pub fn get_with_default(prompt:String,secure:bool,starting_value:Option<String>,
         // Get the cursor position when we've started
         let initial_cur_pos = crossterm::cursor::position().expect("Failed to obtain cursor position!").0;
         // This is going to indicate where to add new letters to "input"
-        let mut idx = if let Some(v) = starting_curpos {
-            v
-        } else {
+        // If starting_value is defined - put the cursor in position defined by starting_curpos or at the
+        // end of starting_value if starting_curpos is not defined.
+        let mut idx = if let Some(ref v) = starting_value {
+            starting_curpos.unwrap_or(v.len())
+        }
+        // If starting_value isn't set, just put our cursor at start of the prompt
+        else {
             0
         };
 

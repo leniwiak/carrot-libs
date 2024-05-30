@@ -41,7 +41,9 @@
 - INPUT: There is a function 'get_with_default()' that let's you create text input with some text on start
 - KINDER: Removed time related functions
 - INPUT: Migrate function ask() from many carrot-utils to this library
+- SYSTEM: New getpref(), getpref_or_exit() and ~~setpref()~~ functions allow programs to quickly retrieve information from system config files.
 
 # Waiting features
 
-- SYSTEM: New getpref() and setpref() functions allow programs to quickly retrieve information from system config files. 
+- SYSTEM: Add setpref() asap
+- INPUT: Custom message for ask()

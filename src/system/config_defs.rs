@@ -8,19 +8,19 @@ contents below
 
 // And this is a structure for default_user_pref configuration
 #[derive(Serialize, Deserialize, Debug, Clone)]
-struct DefaultUserPref {
-    minimal_uid: u32,
-    minimal_gid: u32,
-    password_minimum_len: u32,
-    password_maximum_len: u32,
-    check_capitalisation: bool,
-    check_numbers: bool,
-    check_special_chars: bool,
-    can_change_password: bool,
-    locked: bool,
-    default_profile_dir: String,
-    profile_dir: String,
-    shell: String,
+pub struct DefaultUserPref {
+    pub minimal_uid: u32,
+    pub minimal_gid: u32,
+    pub password_minimum_len: u64,
+    pub password_maximum_len: u64,
+    pub check_capitalisation: bool,
+    pub check_numbers: bool,
+    pub check_special_chars: bool,
+    pub can_change_password: bool,
+    pub locked: bool,
+    pub default_profile_dir: String,
+    pub profile_dir: String,
+    pub shell: String,
 }
 // Default settings for "DefaultUserPref"
 impl ::std::default::Default for DefaultUserPref {
@@ -41,4 +41,4 @@ impl ::std::default::Default for DefaultUserPref {
         }
     }
 }
-const CONFIG_LOCATION_DEFAULT_USER_PREF:&str = "/etc/default_user_pref.toml";
+pub const CONFIG_LOCATION_DEFAULT_USER_PREF:&str = "/etc/default_user_pref.toml";
