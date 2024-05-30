@@ -41,34 +41,34 @@ pub fn size(s:&str) -> Result<u64, String> {
     }
 }
 
-pub fn perms(p:&str, normal_perms:bool) -> u32 {
+pub fn perms(p:&str, normal_perms:bool) -> Result<u32, &'static str> {
     if normal_perms {
         match p {
-            "n" => 0,
-            "---" => 0,
-            "x" => 1,
-            "--x" => 1,
-            "w" => 2,
-            "-w-" => 2,
-            "wx" => 3,
-            "-wx" => 3,
-            "r" => 4,
-            "r--" => 4,
-            "rx" => 5,
-            "r-x" => 5,
-            "rw" => 6,
-            "rw-" => 6,
-            "rwx" => 7,
-            _ => 8,
+            "n" => Ok(0),
+            "---" => Ok(0),
+            "x" => Ok(1),
+            "--x" => Ok(1),
+            "w" => Ok(2),
+            "-w-" => Ok(2),
+            "wx" => Ok(3),
+            "-wx" => Ok(3),
+            "r" => Ok(4),
+            "r--" => Ok(4),
+            "rx" => Ok(5),
+            "r-x" => Ok(5),
+            "rw" => Ok(6),
+            "rw-" => Ok(6),
+            "rwx" => Ok(7),
+            _ => Err("Requested incorrect permission mode!"),
         }
     }
     else {
         match p {
-            "n" => 0,
-            "t" => 1,
-            "g" => 2,
-            "u" => 4,
-            _ => 8,
+            "n" => Ok(0),
+            "t" => Ok(1),
+            "g" => Ok(2),
+            "u" => Ok(4),
+            _ => Err("Requested incorrect permission mode!"),
         }
     }
 }

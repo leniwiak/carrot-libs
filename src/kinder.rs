@@ -18,27 +18,27 @@ pub fn size(s:u64) -> String {
     }
 }
 
-pub fn perms(p:u32, normal_perms:bool) -> String {
+pub fn perms(p:u32, normal_perms:bool) -> Result<String, &'static str> {
     if normal_perms {
         match p {
-            0 => String::from("---"),
-            1 => String::from("--x"),
-            2 => String::from("-w-"),
-            3 => String::from("-wx"),
-            4 => String::from("r--"),
-            5 => String::from("r-x"),
-            6 => String::from("rw-"),
-            7 => String::from("rwx"),
-            _ => String::from("???"),
+            0 => Ok(String::from("---")),
+            1 => Ok(String::from("--x")),
+            2 => Ok(String::from("-w-")),
+            3 => Ok(String::from("-wx")),
+            4 => Ok(String::from("r--")),
+            5 => Ok(String::from("r-x")),
+            6 => Ok(String::from("rw-")),
+            7 => Ok(String::from("rwx")),
+            _ => Err("Requested incorrect permission mode!"),
         }
     }
     else {
         match p {
-            0 => String::from("-"),
-            1 => String::from("t"),
-            2 => String::from("g"),
-            4 => String::from("u"),
-            _ => String::from("?"),
+            0 => Ok(String::from("-")),
+            1 => Ok(String::from("t")),
+            2 => Ok(String::from("g")),
+            4 => Ok(String::from("u")),
+            _ => Err("Requested incorrect permission mode!"),
         }
     }
     
