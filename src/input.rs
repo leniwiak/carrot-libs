@@ -83,6 +83,28 @@ pub fn get(prompt:String,secure:bool) -> Result<Vec<String>, String> {
     get_with_default(prompt, secure, None, None)
 }
 
+pub fn ask(opt: &String) -> Result<bool, String> {
+    match get(format!("{}: Do you really want to delete this? [y/n]: ", opt), false) {
+        Err(e) => {
+            Err(format!("{}: Failed to remove this object. Can't get user input: {}!", opt, e))
+        }
+        Ok(ret) => {
+            let toclear:bool;
+            let input = ret;
+            if input.len() != 1 {
+                println!("Sorry! I don't undestand your input.");
+                return ask(opt);
+            }
+            let lowercased_input = input[0].trim().to_lowercase();
+            if lowercased_input == "y" || lowercased_input == "yes" { toclear = true; }
+            else if lowercased_input == "n" || lowercased_input == "no" { toclear = false; }
+            else { println!("Sorry! I don't undestand your input."); return ask(opt); }
+            Ok(toclear)
+        }
+    }
+    
+}
+
 pub fn get_with_default(prompt:String,secure:bool,starting_value:Option<String>,starting_curpos:Option<usize>) -> Result<Vec<String>, String> {
     // FOR ALL COMMENTS BELLOW: Assume, that user typed this command into a shell: af file then ad dir
     // This variable contains full line typed by the user (List 1.: 'af file then ad dir')

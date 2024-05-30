@@ -39,3 +39,4 @@
 - FILEINFO: Supports 'resolve_symlink' argument on every function
 - INPUT: There is a function 'get_with_default()' that let's you create text input with some text on start
 - KINDER: Removed time related functions
+- INPUT: Migrate function ask() from many carrot-utils to this library
