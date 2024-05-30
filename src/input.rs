@@ -79,7 +79,11 @@ pub fn detect() -> (&'static str, Option<char>) {
     }
 }
 
-pub fn get(prompt:String,secure:bool) -> Vec<String> {
+pub fn get(prompt:String,secure:bool) -> Result<Vec<String>, String> {
+    get_with_default(prompt, secure, None, None)
+}
+
+pub fn get_with_default(prompt:String,secure:bool,starting_value:Option<String>,starting_curpos:Option<usize>) -> Result<Vec<String>, String> {
     // FOR ALL COMMENTS BELLOW: Assume, that user typed this command into a shell: af file then ad dir
     // This variable contains full line typed by the user (List 1.: 'af file then ad dir')
     let mut input:Vec<char> = Vec::new();
@@ -89,16 +93,26 @@ pub fn get(prompt:String,secure:bool) -> Vec<String> {
     if secure {
         print!("This prompt is secured. You're typing silently.");
     }
+    // Print starting value if any
+    if let Some(v) = starting_value {
+        print!("{v}")
+    }
     
     // Flush stdout to print the prompt
-    io::stdout().flush().expect("Cannot flush output!");
+    if io::stdout().flush().is_err() {
+        Err("Cannot flush terminal".to_string())
+    } else {
         // Read line into "input"
         // Process each character written on keyboard
 
         // Get the cursor position when we've started
         let initial_cur_pos = crossterm::cursor::position().expect("Failed to obtain cursor position!").0;
         // This is going to indicate where to add new letters to "input"
-        let mut idx = 0;
+        let mut idx = if let Some(v) = starting_curpos {
+            v
+        } else {
+            0
+        };
 
         loop {
             // Show prompt and contents of input
@@ -246,5 +260,6 @@ pub fn get(prompt:String,secure:bool) -> Vec<String> {
         // Quit from raw mode when we're out of the loop
         print!("\n\r");
         let input_string = input.iter().collect::<String>();
-        input_string.split_whitespace().map(str::to_string).collect()
+        Ok(input_string.split_whitespace().map(str::to_string).collect())
+    }
 }

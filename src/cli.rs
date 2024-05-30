@@ -59,7 +59,7 @@ pub fn cursor<S: AsRef<str>>(action: S, position: usize) -> Result<(), &'static 
     }
 }
 
-pub fn erease<S: AsRef<str>>(action: S, position: usize) -> Result<(), &'static str> {
+pub fn erease<S: AsRef<str>>(action: S) -> Result<(), &'static str> {
     let action = action.as_ref();
     match action {
         "cur_to_eos" => { println!("\x1b[J"); Ok(()) },

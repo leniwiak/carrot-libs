@@ -1,28 +1,43 @@
 #![allow(dead_code)]
 
-pub fn size(s:&str) -> u64 {
+pub fn size(s:&str) -> Result<u64, String> {
     if s.to_lowercase().contains("tb") {
         let justnumber:Vec<&str> = s.split("tb").collect();
-        justnumber[0].parse::<u64>().unwrap()*1099511627776
+        match justnumber[0].parse::<u64>() {
+            Ok(ret) => Ok(ret*1099511627776),
+            Err(ret) => Err(ret.to_string()),
+        }
     }
     else if s.to_lowercase().contains("gb") {
         let justnumber:Vec<&str> = s.split("gb").collect();
-        justnumber[0].parse::<u64>().unwrap()*1073741824
+        match justnumber[0].parse::<u64>() {
+            Ok(ret) => Ok(ret*1073741824),
+            Err(ret) => Err(ret.to_string()),
+        }
     }
     else if s.to_lowercase().contains("mb") {
         let justnumber:Vec<&str> = s.split("mb").collect();
-        justnumber[0].parse::<u64>().unwrap()*1048576
+        match justnumber[0].parse::<u64>() {
+            Ok(ret) => Ok(ret*1048576),
+            Err(ret) => Err(ret.to_string()),
+        }
     }
     else if s.to_lowercase().contains("kb") {
         let justnumber:Vec<&str> = s.split("kb").collect();
-        justnumber[0].parse::<u64>().unwrap()*1024
+        match justnumber[0].parse::<u64>() {
+            Ok(ret) => Ok(ret*1024),
+            Err(ret) => Err(ret.to_string()),
+        }
     }
     else if s.to_lowercase().contains('b') {
         let justnumber:Vec<&str> = s.split('b').collect();
-        justnumber[0].parse::<u64>().unwrap()
+        match justnumber[0].parse::<u64>() {
+            Ok(ret) => Ok(ret),
+            Err(ret) => Err(ret.to_string()),
+        }
     }
     else {
-        0
+        Err("Unknown memory unit!".to_string())
     }
 }
 
