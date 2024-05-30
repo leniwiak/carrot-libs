@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 pub fn size(s:u64) -> String {
     if s >= 1099511627776 {
         format!("{}TB", s/1099511627776)

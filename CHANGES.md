@@ -36,7 +36,12 @@
 ### Added on 30.05.2024
 
 - *: Properly return errors
+- *: Libraries can use Strings or &strs without any issue thanks to this: <S: AsRef<str>>(whatever:S) and this: whatever.as_ref(). 
 - FILEINFO: Supports 'resolve_symlink' argument on every function
 - INPUT: There is a function 'get_with_default()' that let's you create text input with some text on start
 - KINDER: Removed time related functions
 - INPUT: Migrate function ask() from many carrot-utils to this library
+
+# Waiting features
+
+- SYSTEM: New getpref() and setpref() functions allow programs to quickly retrieve information from system config files. 

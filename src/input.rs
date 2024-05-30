@@ -79,14 +79,14 @@ pub fn detect() -> (&'static str, Option<char>) {
     }
 }
 
-pub fn get(prompt:String,secure:bool) -> Result<Vec<String>, String> {
-    get_with_default(prompt, secure, None, None)
+pub fn get<S: AsRef<str>>(prompt:S,secure:bool) -> Result<Vec<String>, String> {
+    get_with_default(prompt.as_ref().to_owned(), secure, None, None)
 }
 
-pub fn ask(opt: &String) -> Result<bool, String> {
-    match get(format!("{}: Do you really want to delete this? [y/n]: ", opt), false) {
+pub fn ask<S: AsRef<str>>(opt: S) -> Result<bool, String> {
+    match get(format!("{}: Do you really want to delete this? [y/n]: ", opt.as_ref()), false) {
         Err(e) => {
-            Err(format!("{}: Failed to remove this object. Can't get user input: {}!", opt, e))
+            Err(format!("{}: Failed to remove this object. Can't get user input: {}!", opt.as_ref(), e))
         }
         Ok(ret) => {
             let toclear:bool;

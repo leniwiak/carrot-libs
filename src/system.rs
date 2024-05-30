@@ -1,3 +1,5 @@
+mod config_defs;
+
 // Check which user/group is currently running
 pub fn current_user() -> Result<u32, &'static str> {
     extern "C" {
@@ -47,7 +49,7 @@ pub fn isroot() -> Result<bool, &'static str> {
     }
 }
 use std::fs;
-pub fn password_check(user:u32, pass:&String) -> Result<bool, String> {
+pub fn password_check<S: AsRef<str>>(user:u32, pass:S) -> Result<bool, String> {
     let data = match fs::read_to_string("/etc/users.toml") {
         Err(e) => {return Err(format!("{:?}", e.kind()));},
         Ok(e) => e,
@@ -61,7 +63,7 @@ pub fn password_check(user:u32, pass:&String) -> Result<bool, String> {
             let l = l.strip_suffix('\"').unwrap();
             let l = l.trim();
             let password_hash = l;
-            if encrypt(pass) == password_hash {
+            if encrypt(pass.as_ref()) == password_hash {
                 return Ok(true);
             } else {
                 return Ok(false);
@@ -74,10 +76,21 @@ pub fn password_check(user:u32, pass:&String) -> Result<bool, String> {
 }
 // Encrypt requested String with SHA512
 use sha3::{Digest, Sha3_512};
-pub fn encrypt(input:&String) -> String {
+pub fn encrypt<S: AsRef<str>>(input:S) -> String {
     let mut hasher = Sha3_512::new();
-    hasher.update(input.as_bytes());
+    hasher.update(input.as_ref().as_bytes());
     let result = hasher.finalize();
     format!("{:X}", result)
 }
 
+
+// View preference from system configs
+pub fn getpref() {
+    todo!();
+}
+
+
+// Change preference from system configs
+pub fn setpref() {
+    todo!();
+}
