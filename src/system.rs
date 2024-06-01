@@ -1,7 +1,35 @@
 mod config_defs;
 
 // Check which user/group is currently running
-pub fn current_user() -> Result<u32, &'static str> {
+pub fn current_user_real() -> Result<u32, &'static str> {
+    extern "C" {
+        fn getuid() -> i32;
+    }
+    unsafe {
+        let result = getuid();
+        if result == -1 {
+            Err("Failed to check currently running user!")
+        }
+        else {
+            Ok(result.try_into().unwrap())
+        }
+    }
+}
+pub fn current_group_real() -> Result<u32, &'static str> {
+    extern "C" {
+        fn getgid() -> i32;
+    }
+    unsafe {
+        let result = getgid();
+        if result == -1 {
+            Err("Failed to check currently running user!")
+        }
+        else {
+            Ok(result.try_into().unwrap())
+        }
+    }
+}
+pub fn current_user_effective() -> Result<u32, &'static str> {
     extern "C" {
         fn geteuid() -> i32;
     }
@@ -15,7 +43,7 @@ pub fn current_user() -> Result<u32, &'static str> {
         }
     }
 }
-pub fn current_group() -> Result<u32, &'static str> {
+pub fn current_group_effective() -> Result<u32, &'static str> {
     extern "C" {
         fn getegid() -> i32;
     }
@@ -31,12 +59,29 @@ pub fn current_group() -> Result<u32, &'static str> {
 }
 
 // Check if currently running user is root
-pub fn isroot() -> Result<bool, &'static str> {
+pub fn isroot_effective() -> Result<bool, &'static str> {
     extern "C" {
         fn geteuid() -> i32;
     }
     unsafe {
         let result = geteuid();
+        if result == -1 {
+            Err("Failed to check currently running user!")
+        }
+        else if result == 0 {
+            Ok(true)
+        }
+        else {
+            Ok(false)
+        }
+    }
+}
+pub fn isroot_real() -> Result<bool, &'static str> {
+    extern "C" {
+        fn getuid() -> i32;
+    }
+    unsafe {
+        let result = getuid();
         if result == -1 {
             Err("Failed to check currently running user!")
         }
@@ -58,8 +103,13 @@ pub fn password_check<S: AsRef<str>>(user:u32, pass:S) -> Result<bool, String> {
     let mut i = 1;
     for l in &lines {
         if *l == format!("id = {}", user) {
-            i += 4;
-            let l = lines[i].strip_prefix("password = \"").unwrap();
+            // If you find line containing text "id = <requested ID>"
+            // move 3 lines ahead and try to compare passwords
+            i += 3;
+            let l = match lines[i].strip_prefix("password = \"") {
+                None => return Err("Password field is empty or the user does not exist".to_owned()),
+                Some(a) => a,
+            };
             let l = l.strip_suffix('\"').unwrap();
             let l = l.trim();
             let password_hash = l;
