@@ -107,6 +107,7 @@ pub fn getpref<S: AsRef<str>>(file:S, value:S) -> Result<String, String> {
                         "check_special_chars" => Ok(cfg.check_special_chars.to_string()),
                         "can_change_password" => Ok(cfg.can_change_password.to_string()),
                         "locked" => Ok(cfg.locked.to_string()),
+                        "create_profile" => Ok(cfg.create_profile.to_string()),
                         "default_profile_dir" => Ok(cfg.default_profile_dir),
                         "profile_dir" => Ok(cfg.profile_dir),
                         "shell" => Ok(cfg.shell),
