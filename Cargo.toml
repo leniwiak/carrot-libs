@@ -13,9 +13,6 @@ debug = false
 [dependencies]
 crossterm = "*"
 sha3 = "*"
-serde = "*"
-serde_derive = "*"
-confy = "*"
 
 [source.crates-io]
 replace-with = "vendored-sources"
