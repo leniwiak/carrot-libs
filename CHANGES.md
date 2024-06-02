@@ -43,6 +43,12 @@
 - INPUT: Migrate function ask() from many carrot-utils to this library
 - SYSTEM: New getpref(), getpref_or_exit() and ~~setpref()~~ functions allow programs to quickly retrieve information from system config files.
 
+# Release 0.3.1:
+
+### Added on 2.06.2024
+
+- Configuration file management was moved from carrot-libs to programs itself
+
 # Waiting features
 
 - SYSTEM: Add setpref() asap

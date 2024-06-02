@@ -1,4 +1,3 @@
-mod config_defs;
 use sha3::{Digest, Sha3_512};
 
 // Check which user/group is currently running
