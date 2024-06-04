@@ -102,7 +102,7 @@ pub fn password_check<S: AsRef<str>>(user:u32, pass:S) -> Result<bool, String> {
     let lines:Vec<&str> = data.lines().collect();
     let mut i = 1;
     for l in &lines {
-        if *l == format!("id = {}", user) {
+        if *l.trim() == format!("id = {}", user) {
             // If you find line containing text "id = <requested ID>"
             // move 3 lines ahead and try to compare passwords
             i += 3;
