@@ -88,13 +88,13 @@ pub fn ask<S: AsRef<str>>(text: S) -> Result<bool, String> {
             let toclear:bool;
             let input = ret;
             if input.len() != 1 {
-                println!("Sorry! I don't undestand your input.");
-                return ask(opt);
+                println!("I don't undestand! Try again.");
+                return ask(text);
             }
             let lowercased_input = input[0].trim().to_lowercase();
             if lowercased_input == "y" || lowercased_input == "yes" { toclear = true; }
             else if lowercased_input == "n" || lowercased_input == "no" { toclear = false; }
-            else { println!("I don't undestand! Try again."); return ask(opt); }
+            else { println!("I don't undestand! Try again."); return ask(text); }
             Ok(toclear)
         }
     }
