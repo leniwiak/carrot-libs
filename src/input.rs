@@ -79,10 +79,10 @@ pub fn detect() -> (&'static str, Option<char>) {
     }
 }
 
-pub fn ask<S: AsRef<str>>(opt: S) -> Result<bool, String> {
-    match get(format!("{}: Do you really want to delete this? [y/n]: ", opt.as_ref()), false) {
+pub fn ask<S: AsRef<str>>(text: S) -> Result<bool, String> {
+    match get(format!("{} [y/n]: ", text.as_ref()), false) {
         Err(e) => {
-            Err(format!("{}: Failed to remove this object. Can't get user input: {}!", opt.as_ref(), e))
+            Err(format!("Can't get user input: {}", e))
         }
         Ok(ret) => {
             let toclear:bool;
@@ -94,7 +94,7 @@ pub fn ask<S: AsRef<str>>(opt: S) -> Result<bool, String> {
             let lowercased_input = input[0].trim().to_lowercase();
             if lowercased_input == "y" || lowercased_input == "yes" { toclear = true; }
             else if lowercased_input == "n" || lowercased_input == "no" { toclear = false; }
-            else { println!("Sorry! I don't undestand your input."); return ask(opt); }
+            else { println!("I don't undestand! Try again."); return ask(opt); }
             Ok(toclear)
         }
     }
