@@ -186,13 +186,13 @@ pub fn get_with_default(prompt:String,secure:bool,starting_value:Option<String>,
                 },
 
                 // CTRL+ARROW: Move cursor to the next whitespace
-                "CTRL+LEFT" => {
+                "CTRL-LEFT" => {
                     while idx != 0 {
                         idx -= 1;
                         if input[idx].is_whitespace() { break }
                     }
                 }
-                "CTRL+RIGHT" => {
+                "CTRL-RIGHT" => {
                     while idx != input.len() {
                         idx += 1;
                         if idx == input.len() || input[idx].is_whitespace() { break }
@@ -227,7 +227,7 @@ pub fn get_with_default(prompt:String,secure:bool,starting_value:Option<String>,
                 // CTRL+BACKSPACE: Remove character before cursor until whitespace
                 // FUNFACT: Terminal emulators on Linux detect CTRL+Backspace as CTRL+H
                 // The code below is correct. Don't change KeyCode::Char to KeyCode::Spacebar
-                "CTRL+BACKSPACE" => {
+                "CTRL-BACKSPACE" => {
                     while idx > 0 {
                         if !input[idx-1].is_whitespace() {
                             input.remove(idx-1);
@@ -249,7 +249,7 @@ pub fn get_with_default(prompt:String,secure:bool,starting_value:Option<String>,
                     } else {print!("\x07")};
                 },
                 // CTRL+DEL: Remove all characters after cursor until whitespace
-                "CTRL+DEL" => {
+                "CTRL-DEL" => {
                     while idx < input.len() {
                         if !input[idx].is_whitespace() {
                             input.remove(idx);
