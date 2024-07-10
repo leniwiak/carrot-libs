@@ -49,7 +49,12 @@
 
 - Configuration file management was moved from carrot-libs to programs itself
 
+# Release 0.3.2:
+
+### Added on 11.07.2024
+
+- SYSTEM: Added a list of allowed simple characters for usernames, variables, etc.
+- INPUT: Custom message for ask() (This was actually added before, but I don't exactly know when)
+
 # Waiting features
 
-- SYSTEM: Add setpref() asap
-- INPUT: Custom message for ask()
