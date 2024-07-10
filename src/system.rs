@@ -18,7 +18,7 @@ pub fn check_simple_characters_compliance<S: AsRef<str>>(input: S) -> Result<(),
         if i == 0 && SIMPLE_CHARACTERS_NOT_STARTING.contains(&c.1) {
             return Err("This text can't start with a number, period, hyphen nor the underscore");
         }
-        if !SIMPLE_CHARACTERS.contains(&c.1) || !SIMPLE_CHARACTERS_NOT_STARTING.contains(&c.1) {
+        if !SIMPLE_CHARACTERS.contains(&c.1) && !SIMPLE_CHARACTERS_NOT_STARTING.contains(&c.1) {
             return Err("This text may contain simple characters only");
         }
     }
