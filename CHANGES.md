@@ -54,7 +54,13 @@
 ### Added on 11.07.2024
 
 - SYSTEM: Added a list of allowed simple characters for usernames, variables, etc.
-- INPUT: Custom message for ask() (This was actually added before, but I don't exactly know when)
+- INPUT: Custom message for ask() (This was actually added before, but I don't exactly know when. Anyway, still flexing.)
+
+# Release 0.3.3:
+
+### Added on 28.08.2024
+
+- INPUT: Fixed an issue that caused text to glitch when input is wider than console
 
 # Waiting features
 

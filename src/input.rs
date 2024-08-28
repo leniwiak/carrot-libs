@@ -2,8 +2,8 @@
 use std::process;
 use std::io;
 use std::io::Write;
-use crossterm::terminal::{Clear, ClearType};
 use crossterm::event::{self, Event::Key, KeyEvent, KeyCode, KeyModifiers};
+use crossterm::terminal::ClearType;
 
 fn flush() {
     io::stdout().flush().expect("Failed to flush terminal output!")
@@ -127,7 +127,7 @@ pub fn get_with_default(prompt:String,secure:bool,starting_value:Option<String>,
         // Read line into "input"
         // Process each character written on keyboard
 
-        // Get the cursor position when we've started
+        // Get the starting cursor position
         let initial_cur_pos = crossterm::cursor::position().expect("Failed to obtain cursor position!").0;
         // This is going to indicate where to add new letters to "input"
         // If starting_value is defined - put the cursor in position defined by starting_curpos or at the
@@ -140,19 +140,36 @@ pub fn get_with_default(prompt:String,secure:bool,starting_value:Option<String>,
             0
         };
 
+        // Move to start of the column and show the prompt
+        if ! secure {
+            print!("\r{}", prompt);
+        }
         loop {
             // Show prompt and contents of input
             if !secure {
-                // Move to start of the column
-                print!("\r");
                 // Clear everything on that line
-                print!("{}", Clear(ClearType::CurrentLine));
+                print!("{}", crossterm::terminal::Clear(ClearType::CurrentLine));
+                // Collect all letters from user's input
                 let input_string = input.iter().collect::<String>();
-                print!("{}{}", prompt, input_string);
-                // Move cursor to position defined in "idx" + "initial_cur_pos"
-                // Flush on start and end of the loop
-                print!("{}", crossterm::cursor::MoveToColumn(idx as u16 +initial_cur_pos)); 
+
+                // Calculate length of text on terminal and the terminal itself
+                let input_lenght = input_string.len();
+                let term_lenght_without_prompt = (crossterm::terminal::size().unwrap().0 - initial_cur_pos) as usize;
+
+                // Move cursor to the start of line
+                print!("\r");
+                if input_lenght < term_lenght_without_prompt {
+                    // Show currently inserted string
+                    print!("{}{}", prompt, input_string);
+                } else {
+                    let skip = input_lenght/term_lenght_without_prompt;
+                    let take = (input_lenght%term_lenght_without_prompt)+1;
+                    // Show part of the currently inserted string that fits in console
+                    print!("{prompt}{}", input_string.char_indices().skip((term_lenght_without_prompt*skip)-1).take(take).map(|x| x.1).collect::<String>());
+                }
+                
             }
+            // Flush on start and end of the loop
             flush();
 
             let (key_type, letter) = detect();
@@ -272,8 +289,8 @@ pub fn get_with_default(prompt:String,secure:bool,starting_value:Option<String>,
 
                 // ANY CHARACTER WITHOUT CTRL: Show it on keyboard and add it to "input" variable
                 "CHAR" => {
-                    // Insert a char in "input" on position where the cursor is located + the number 
-                    input.insert(idx, letter.expect(""));
+                    // Insert a char in "input" on position where the cursor is located
+                    input.insert(idx, letter.unwrap());
                     // Move cursor to the right as we type
                     idx +=1;
                 },
