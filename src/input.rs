@@ -110,6 +110,11 @@ pub fn get_with_default(prompt:String,secure:bool,starting_value:Option<String>,
     // This variable contains full line typed by the user (List 1.: 'af file then ad dir')
     let mut input:Vec<char> = Vec::new();
 
+    // Reserve full line for input collector
+    if crossterm::cursor::position().expect("Failed to obtain cursor position!").0 != 0 {
+        println!();
+    }
+
     // Print a prompt
     print!("{prompt}");
     if secure {
@@ -128,7 +133,8 @@ pub fn get_with_default(prompt:String,secure:bool,starting_value:Option<String>,
         // Process each character written on keyboard
 
         // Get the starting cursor position
-        let initial_cur_pos = crossterm::cursor::position().expect("Failed to obtain cursor position!").0;
+        let initial_cur_pos = crossterm::cursor::position().expect("Failed to obtain cursor position!").0 as usize;
+
         // This is going to indicate where to add new letters to "input"
         // If starting_value is defined - put the cursor in position defined by starting_curpos or at the
         // end of starting_value if starting_curpos is not defined.
@@ -153,21 +159,25 @@ pub fn get_with_default(prompt:String,secure:bool,starting_value:Option<String>,
                 let input_string = input.iter().collect::<String>();
 
                 // Calculate length of text on terminal and the terminal itself
+                let term_lenght = crossterm::terminal::size().unwrap().0 as usize;
                 let input_lenght = input_string.len();
-                let term_lenght_without_prompt = (crossterm::terminal::size().unwrap().0 - initial_cur_pos) as usize;
+                let term_lenght_without_prompt = (term_lenght - initial_cur_pos as usize).saturating_sub(1);
 
                 // Move cursor to the start of line
                 print!("\r");
-                if input_lenght < term_lenght_without_prompt {
-                    // Show currently inserted string
-                    print!("{}{}", prompt, input_string);
-                } else {
-                    let skip = input_lenght/term_lenght_without_prompt;
-                    let take = (input_lenght%term_lenght_without_prompt)+1;
-                    // Show part of the currently inserted string that fits in console
-                    print!("{prompt}{}", input_string.char_indices().skip((term_lenght_without_prompt*skip)-1).take(take).map(|x| x.1).collect::<String>());
-                }
                 
+                // How many times text overflowed terminal width?
+                let overflow = idx/term_lenght_without_prompt;
+
+                // Show text on terminal
+                print!("{prompt}{}", input_string.char_indices()
+                .skip(((overflow)*term_lenght_without_prompt).saturating_sub(1))
+                .take(term_lenght_without_prompt)
+                .map(|x| x.1).collect::<String>());
+
+                // Reposition the cursor every time
+                let cursor_location = (idx%term_lenght_without_prompt)+ (overflow!=0) as usize;
+                print!("{}", crossterm::cursor::MoveToColumn(initial_cur_pos as u16 + cursor_location as u16));
             }
             // Flush on start and end of the loop
             flush();
@@ -190,14 +200,14 @@ pub fn get_with_default(prompt:String,secure:bool,starting_value:Option<String>,
                 // ARROWS without CTRL: Cursor movement
                 "LEFT" => {
                     if idx != 0 {
-                        // Move cursor to left
+                        // Move cursor to the left
                         idx -= 1;
                     } else {print!("\x07");continue;};
                     
                 },
                 "RIGHT" => {
                     if idx != input.len() {
-                        // Move cursor to right
+                        // Move cursor to the right
                         idx += 1;
                     } else {print!("\x07");continue;};
                 },
@@ -299,7 +309,7 @@ pub fn get_with_default(prompt:String,secure:bool,starting_value:Option<String>,
                     process::exit(1);
                 }
             };
-        };
+        };        
         // Quit from raw mode when we're out of the loop
         print!("\n\r");
         let input_string = input.iter().collect::<String>();

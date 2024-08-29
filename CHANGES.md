@@ -60,7 +60,11 @@
 
 ### Added on 28.08.2024
 
-- INPUT: Fixed an issue that caused text to glitch when input is wider than console
+- INPUT: Fixed an issue that caused text to glitch when input is wider than console (just kidding)
+
+### Added on 29.08.2024
+
+- INPUT: Fixed an issue that caused text to glitch when input is wider than console (now it really works!)
 
 # Waiting features
 
