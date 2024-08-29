@@ -64,7 +64,8 @@
 
 ### Added on 29.08.2024
 
-- INPUT: Fixed an issue that caused text to glitch when input is wider than console (now it really works!)
+- INPUT: Fixed an issue that caused text to glitch when input is wider than console (ok nevermind...)
+- INPUT: Known bug: Last line of command's output that does not end with "\n" is overwritten by text input entry
 
 # Waiting features
 

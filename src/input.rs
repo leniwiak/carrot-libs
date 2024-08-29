@@ -110,11 +110,6 @@ pub fn get_with_default(prompt:String,secure:bool,starting_value:Option<String>,
     // This variable contains full line typed by the user (List 1.: 'af file then ad dir')
     let mut input:Vec<char> = Vec::new();
 
-    // Reserve full line for input collector
-    if crossterm::cursor::position().expect("Failed to obtain cursor position!").0 != 1 {
-        println!();
-    }
-
     // Print a prompt
     print!("{prompt}");
     if secure {
