@@ -111,7 +111,7 @@ pub fn get_with_default(prompt:String,secure:bool,starting_value:Option<String>,
     let mut input:Vec<char> = Vec::new();
 
     // Reserve full line for input collector
-    if crossterm::cursor::position().expect("Failed to obtain cursor position!").0 != 0 {
+    if crossterm::cursor::position().expect("Failed to obtain cursor position!").0 != 1 {
         println!();
     }
 
