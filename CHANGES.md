@@ -67,5 +67,8 @@
 - INPUT: Fixed an issue that caused text to glitch when input is wider than console (ok nevermind...)
 - INPUT: Known bug: Last line of command's output that does not end with "\n" is overwritten by text input entry
 
-# Waiting features
+# Release 0.4.0:
 
+## Added on 16.02.2024
+
+- INPUT: This library is removed now
